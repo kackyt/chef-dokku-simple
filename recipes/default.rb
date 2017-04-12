@@ -14,7 +14,11 @@ include_recipe "dokku-simple::app_envs"
 
 ## initial git push works better if we restart docker first
 service 'docker' do
-  provider Chef::Provider::Service::Upstart
+  if node['platform_version'].to_f >= 15
+    provider Chef::Provider::Service::Systemd
+  else
+    provider Chef::Provider::Service::Upstart
+  end
   supports :status => true, :restart => true, :reload => true
   action [ :enable, :start ]
 end
