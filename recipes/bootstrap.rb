@@ -2,7 +2,9 @@
 package "wget"
 
 ## make sure we have apt-add-repository
-package "python-software-properties"
+if node['platform_version'].to_f < 16
+  package "python-software-properties"
+end
 package "software-properties-common"
 
 url = "https://raw.github.com/progrium/dokku/#{node[:dokku][:tag]}/bootstrap.sh"
