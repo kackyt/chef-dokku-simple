@@ -13,3 +13,11 @@ bash "dokku-bootstrap" do
   code "wget -qO- #{url} | sudo DOKKU_TAG=#{node[:dokku][:tag]} " +
     "DOKKU_ROOT=\"#{node[:dokku][:root]}\" bash"
 end
+
+# change owner to dokku
+execute "chown-var-lib" do
+  command "chown -R dokku:dokku /var/lib/dokku"
+  user "root"
+  action :run
+end
+
