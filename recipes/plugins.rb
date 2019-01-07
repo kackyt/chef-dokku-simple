@@ -1,10 +1,15 @@
+version = node[:dokku][:tag].strip.gsub(/^v/i, '').split('.')
+
+major = version[0].to_i
+minor = version[1].to_i
+patch = version[2].to_i
+
 ## download requested plugins
 node[:dokku][:plugins].each do |name, url|
   target_dir = "/var/lib/dokku/plugins/#{name}"
-  version = node[:dokku][:tag].strip.gsub(/^v/i, '').to_f
 
   if url.to_s == "remove"
-    if version  < 0.4
+    if major == 0 && minor < 4
       directory target_dir do
         recursive true
         action :delete
@@ -19,7 +24,7 @@ node[:dokku][:plugins].each do |name, url|
   else
     (url, rev) = url.split("#", 2) if url.include?("#")
 
-    if version < 0.4
+    if major == 0 && minor < 4
       git target_dir do
         repository url
         revision rev if rev
@@ -36,10 +41,11 @@ node[:dokku][:plugins].each do |name, url|
   end
 end
 
-## install all plugins
-bash 'dokku-plugins-install' do
-  cwd '/var/lib/dokku/plugins'
-  code 'dokku plugins-install'
-  action :nothing
+if major == 0 && minor < 4
+  ## install all plugins
+  bash 'dokku-plugins-install' do
+    cwd '/var/lib/dokku/plugins'
+    code 'dokku plugins-install'
+    action :nothing
+  end
 end
-
